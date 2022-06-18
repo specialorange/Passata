@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,13 +13,20 @@ SECRET_KEY = os.getenv("DJANGO_PASSATA_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "django-passata-env.eba-chnjwztd.us-east-1.elasticbeanstalk.com",
-    "localhost:8001",
-    "localhost:8000",
-    "localhost",
-    "127.0.0.1",
-]
+# If in production
+if "RDS_DB_NAME" in os.environ:
+    print("IN PRODUCTION")
+    ALLOWED_HOSTS = [
+        "django-passata-env.eba-chnjwztd.us-east-1.elasticbeanstalk.com",
+    ]
+else:
+    print("IN DEVELOPMENT")
+    ALLOWED_HOSTS = [
+        "localhost:8001",
+        "localhost:8000",
+        "localhost",
+        "127.0.0.1",
+    ]
 
 INSTALLED_APPS = [
     "django.contrib.admin",

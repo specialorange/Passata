@@ -17,6 +17,7 @@ else:
     print("IN DEVELOPMENT")
     DEBUG = True
     ALLOWED_HOSTS = [
+        "django-passata-env.eba-chnjwztd.us-east-1.elasticbeanstalk.com",
         "localhost:8001",
         "localhost:8000",
         "localhost",

@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv("DJANGO_PASSATA_SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "django-passata-env.eba-h8peuzpk.us-west-2.elasticbeanstalk.com",
+    "django-passata-env.eba-chnjwztd.us-east-1.elasticbeanstalk.com",
     "localhost:8001",
     "localhost:8000",
     "localhost",

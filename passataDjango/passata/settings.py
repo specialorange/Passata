@@ -12,7 +12,12 @@ SECRET_KEY = "d++63$z9(e-6znpd$9z2ht10169_ikcu*@(s%6rbcmkj)cz3^0"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["django-passata-env.eba-h8peuzpk.us-west-2.elasticbeanstalk.com"]
+ALLOWED_HOSTS = [
+    "django-passata-env.eba-h8peuzpk.us-west-2.elasticbeanstalk.com",
+    "localhost:8001",
+    "localhost:8000",
+    "localhost",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",

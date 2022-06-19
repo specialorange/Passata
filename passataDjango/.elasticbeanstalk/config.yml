@@ -2,11 +2,13 @@ branch-defaults:
   default:
     environment: null
     group_suffix: null
+  main:
+    environment: ebdjango-passata-env
 global:
-  application_name: eb-django-passata
+  application_name: ebdjango-passata
   branch: null
   default_ec2_keyname: eb-django-passata-keypair
-  default_platform: Python 3.8
+  default_platform: Python 3.8 running on 64bit Amazon Linux 2
   default_region: us-east-1
   include_git_submodules: true
   instance_profile: null
@@ -14,5 +16,5 @@ global:
   platform_version: null
   profile: null
   repository: null
-  sc: null
+  sc: git
   workspace_type: Application

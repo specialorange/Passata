@@ -21,6 +21,6 @@ urlpatterns = [
     re_path("grappelli/", include("grappelli.urls")),  # grappelli URLS
     re_path(r"adminpanel/?", admin.site.urls),
     re_path("batch/", include("batch.urls")),
-    # re_path("/", views.indexView.as_view(), name="indexView"),
+    re_path("/", views.indexView.as_view(), name="indexView"),
     re_path("", views.indexView.as_view(), name="indexView"),
 ]

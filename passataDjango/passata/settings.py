@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_PASSATA_SECRET_KEY")
@@ -21,9 +22,9 @@ if "AWS_STORAGE_BUCKET_NAME" in os.environ:
 if "RDS_DB_NAME" in os.environ:
     print("IN PRODUCTION")
     ALLOWED_HOSTS = [
-        "ebdjango-passata-env.us-east-1.elasticbeanstalk.com",
-        "127.0.0.1:8000",
-        "127.0.0.1",
+        "ec2-54-237-192-9.compute-1.amazonaws.com",
+        "54.237.192.9",
+        "passata.life",
     ]
     DATABASES = {
         "default": {
@@ -49,7 +50,7 @@ else:
         }
     }
     ALLOWED_HOSTS = [
-        "django-passata-env.eba-chnjwztd.us-east-1.elasticbeanstalk.com",
+        "ebdjango-passata-env.us-east-1.elasticbeanstalk.com",
         "localhost:8001",
         "localhost:8000",
         "localhost",
@@ -130,5 +131,5 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
-STATIC_ROOT = "static"

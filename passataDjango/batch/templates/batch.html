@@ -1,0 +1,14 @@
+{% extends "baseSauce.html" %}
+
+{% block title %}Single Batch{% endblock %}
+
+{% block content %}
+   <h1>Single Batch</h1>
+   	{{batch}} <br>
+      Ingredients:<br>
+      {% for ingredient in batch.recipe.ingredients.all %}
+         {{ingredient}}
+      {% endfor %}
+   <hr>
+
+{% endblock content %}

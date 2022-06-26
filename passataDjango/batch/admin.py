@@ -17,9 +17,9 @@ class IngredientInline(admin.TabularInline):
 @admin.register(models.Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = [
-        "full_name",
         "name",
         "food",
+        "full_name",
         "volume_amount",
         "volume_unit",
     ]
@@ -35,6 +35,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class StepsInline(admin.TabularInline):
+    # class StepsInline(admin.StackedInline):
     model = models.Process.steps.through
 
 
@@ -42,7 +43,6 @@ class StepsInline(admin.TabularInline):
 class ProcessAdmin(admin.ModelAdmin):
     list_display = [
         "name",
-        "batch",
     ]
     inlines = [StepsInline]
 
@@ -64,6 +64,7 @@ class ConsumerAdmin(admin.ModelAdmin):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
+        "__str__",
         "name",
         "order_id",
         "createdAt",
@@ -90,10 +91,27 @@ class VolumeUnitAdmin(admin.ModelAdmin):
     ]
 
 
+@admin.register(models.WeightUnit)
+class WeightUnitAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "unit",
+    ]
+
+
+@admin.register(models.BasicStep)
+class BasicStepAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+    ]
+
+
 @admin.register(models.Step)
 class StepAdmin(admin.ModelAdmin):
     list_display = [
         "name",
+        "batch",
+        "process",
         "initial_weight_amount",
         "final_weight_amount",
         "weight_unit",
@@ -106,8 +124,8 @@ class StepAdmin(admin.ModelAdmin):
 @admin.register(models.Batch)
 class BatchAdmin(admin.ModelAdmin):
     list_display = [
-        "description",
         "batch_id",
+        "description",
         "recipe",
         "cost",
         "volume_amount",

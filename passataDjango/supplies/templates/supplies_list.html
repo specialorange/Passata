@@ -1,0 +1,23 @@
+{% extends "baseSauce.html" %}
+
+{% block title %}All Supplies{% endblock %}
+
+{% block content %}
+   <h1>Supplies</h1>
+
+   <div class="pure-g">
+      {% for supply in supplies %}
+         <div class="pure-u-1-3">
+
+            <a class="col mx-3 btn btn-outline-primary"
+            href="{% url 'supplies:single' pk=supply.id%}">Supply : {{supply}}</a>
+            <br>
+            Ingredients:<br>
+            {% for ingredient in batch.recipe.ingredients.all %}
+               {{ingredient}}
+            {% endfor %}
+         </div>
+      {% endfor %}
+   </div>
+{% endblock content %}
+

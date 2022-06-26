@@ -2,13 +2,13 @@ from django.urls import re_path
 
 from . import views
 
-app_name = "batch"
+app_name = "supplies"
 
 urlpatterns = [
-    re_path(r"all/?", views.BatchesView.as_view(), name="all"),
+    re_path(r"all/?", views.SuppliesList.as_view(), name="all"),
     re_path(
-        r"^(?P<batchID>[a-zA-Z0-9-\w:]+)/?",
-        views.BatchView.as_view(),
+        r"^(?P<pk>[a-zA-Z0-9-\w:]+)/?",
+        views.SupplyView.as_view(),
         name="single",
     ),
 ]

@@ -14,13 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, re_path
-from passata import views
+from django.urls import re_path, include
+from passata import views as passataViews
+from project.views import views as projectViews
+from django.conf import settings
+from django.conf.urls.static import static
 
+# from django.conf.urls import include
 urlpatterns = [
     re_path("grappelli/", include("grappelli.urls")),  # grappelli URLS
     re_path(r"adminpanel/?", admin.site.urls),
-    re_path("batch/", include("batch.urls")),
-    re_path("/", views.indexView.as_view(), name="indexView"),
-    re_path("", views.indexView.as_view(), name="indexView"),
+    re_path("__debug__/", include("debug_toolbar.urls")),
+    # include(("jobs.urls", "jobs"), namespace="jobs")),
+    re_path(r"^batches/", include("batch.urls", namespace="batches")),
+    re_path(r"^supplies/", include("supplies.urls", namespace="supplies")),
+    re_path("", projectViews.indexView.as_view(), name="indexView"),
 ]
+# ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

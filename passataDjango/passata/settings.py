@@ -1,4 +1,5 @@
 import os
+import mimetypes
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,6 +37,7 @@ if "RDS_DB_NAME" in os.environ:
             "PORT": os.environ["RDS_PORT"],
         }
     }
+    DEBUG = False
 else:
     print("IN DEVELOPMENT")
     DEBUG = True
@@ -56,6 +58,7 @@ else:
         "localhost",
         "127.0.0.1",
     ]
+    mimetypes.add_type("text/css", ".css", True)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -64,14 +67,28 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
+    "corsheaders",
     # Third party
     "grappelli",
     "storages",
     # self
     "batch",
+    "supplies",
 ]
 
-MIDDLEWARE = [
+
+# MIDDLEWARE CONFIGURATION
+# ------------------------------------------------------------------------------
+SECURITY_MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+]
+
+CORS_MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+]
+
+DJANGO_MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -81,6 +98,28 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+DEV_MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+# If in production
+if "RDS_DB_NAME" in os.environ:
+    MIDDLEWARE = (
+        SECURITY_MIDDLEWARE
+        + CORS_MIDDLEWARE
+        # + WHITENOISE_MIDDLEWARE
+        + DJANGO_MIDDLEWARE
+    )
+else:
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        "localhost",
+        "localhost:8000",
+        "localhost:8001",
+    ]
+    MIDDLEWARE = (
+        SECURITY_MIDDLEWARE + CORS_MIDDLEWARE + DJANGO_MIDDLEWARE + DEV_MIDDLEWARE
+    )
+
 ROOT_URLCONF = "passata.urls"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
@@ -88,7 +127,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "project/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -132,4 +171,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "project/static"),
+]
 STATIC_URL = "/static/"

@@ -1,4 +1,13 @@
+import string
+import random
+
 from django.db import models
+from django.db import IntegrityError
+from django.utils import timezone
+
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return "".join(random.choice(chars) for _ in range(size))
 
 
 class PhoneNumberManager(models.Manager):
@@ -64,7 +73,7 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.consumer} for {self.name}"
 
 
 class Chef(models.Model):
@@ -119,14 +128,15 @@ class Ingredient(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        if self.name:
-            return self.name
-        else:
-            return f"{self.food} - {self.volume_amount} {self.volume_unit}"
-        # return self.name
+        return self.full_name()
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name = str(self.food)
+            super().save(*args, **kwargs)
 
     def full_name(self):
-        return self.__str__()
+        return f"{self.name} - {self.volume_amount}"
         # return f"{self.food} - {self.volume_amount} {self.volume_unit}"
 
 
@@ -136,9 +146,28 @@ class Recipe(models.Model):
     steps = models.TextField(blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
+    def get_ingredients(self):
+        if self.ingredients:
+            return self.ingredients.all()
+            # return "%s" % " / ".join(
+            #     [ingredient.name for ingredient in self.ingredients.all()]
+            # )
+
+
+class BasicStep(models.Model):
+    name = models.CharField(max_length=300, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 
 class Step(models.Model):
-    name = models.CharField(max_length=300, blank=True, null=True)
+    name = models.ForeignKey(
+        BasicStep, on_delete=models.DO_NOTHING, related_name="step", null=True
+    )
     initial_weight_amount = models.DecimalField(
         max_digits=7, decimal_places=2, blank=True, null=True
     )
@@ -154,7 +183,22 @@ class Step(models.Model):
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     chefs = models.ManyToManyField(Chef)
+    batch = models.ForeignKey(
+        "batch.Batch",
+        on_delete=models.DO_NOTHING,
+        related_name="step",
+        null=True,
+    )
+    process = models.ForeignKey(
+        "batch.Process",
+        on_delete=models.DO_NOTHING,
+        related_name="step",
+        null=True,
+    )
     createdAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.order} - {self.name}"
 
     class Meta:
         ordering = ["order"]
@@ -162,19 +206,23 @@ class Step(models.Model):
 
 class Process(models.Model):
     name = models.CharField(max_length=300, blank=True, null=True)
-    steps = models.ManyToManyField(Step)
-    batch = models.ForeignKey(
+    steps = models.ManyToManyField(
         "batch.Batch",
-        on_delete=models.DO_NOTHING,
-        related_name="process",
+        through="batch.Step",
     )
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name_plural = "Processes"
 
 
 class Batch(models.Model):
     description = models.TextField(
         blank=True,
     )
-    batch_id = models.CharField(max_length=50, blank=True, null=True)
+    batch_id = models.CharField(max_length=50, blank=True, unique=True)
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.DO_NOTHING,
@@ -191,7 +239,6 @@ class Batch(models.Model):
     )
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
-    steps = models.ManyToManyField(Step)
     createdAt = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -199,3 +246,32 @@ class Batch(models.Model):
 
     def __str__(self):
         return self.batch_id
+
+    def save(self, *args, **kwargs):
+        if not self.batch_id:
+            self.createdAt = timezone.localtime(timezone.now())
+            self.batch_id = "{}-{}:{}".format(
+                id_generator(),
+                self.createdAt.strftime("%m%d%y"),
+                self.createdAt.strftime("%M%S"),
+            )
+            success = False
+            errors = 0
+            while not success:
+                try:
+                    super().save(*args, **kwargs)
+                except IntegrityError:
+                    errors += 1
+                    if errors > 3:
+                        # tried 3 times, no dice. raise the integrity error and handle elsewhere
+                        raise
+                    else:
+                        self.batch_id = "{}-{}:{}".format(
+                            id_generator(),
+                            self.createdAt.strftime("%m%d%y"),
+                            self.createdAt.strftime("%M%S"),
+                        )
+                else:
+                    success = True
+        else:
+            super().save(*args, **kwargs)
